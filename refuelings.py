@@ -23,13 +23,13 @@ def add_refueling(message: types.Message):
                 pass
 
 
-def new_user_check(id: int) -> bool:
+def new_user_check(user_id: int) -> bool:
     """Проверяет есть ли пользователь в базе,
     если нет, возвращает True,
     если есть, то возвращает False"""
     data = db.get_data()
     for obj in data:
-        if obj['user_id'] == id:
+        if obj['user_id'] == user_id:
             return False
     return True
 
