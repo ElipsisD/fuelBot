@@ -1,9 +1,21 @@
-"""Работа с сообщениями о заправке"""
+"""Работа с данными о заправке"""
 import re
+from typing import NamedTuple
+
 from aiogram import types
+
 from utils import strtime
 from . import db
 from . import exceptions
+
+
+class Refueling(NamedTuple):
+    """Структура данных о новой заправке"""
+    date: str
+    car: str
+    odo: int
+    filing_volume: float
+    # TODO оптимизировать код под использоавние класса Refueling
 
 
 def add_refueling(message: types.Message, cars: list = None, selected_car: str = None):

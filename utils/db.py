@@ -1,5 +1,6 @@
 """Работа с БД"""
 import json
+
 from utils import strtime
 
 filename = 'db.json'
@@ -23,10 +24,7 @@ def get_data() -> dict:
     """Получение всей БД"""
     try:
         with open(filename, 'r', encoding='utf8') as f:
-            try:
-                return json.load(f)
-            except json.JSONDecodeError:
-                return {}
+            return json.load(f)
     except FileNotFoundError:
         return {}
 
