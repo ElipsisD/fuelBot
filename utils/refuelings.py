@@ -15,7 +15,7 @@ class Refueling(NamedTuple):
     car: str
     odo: int
     filing_volume: float
-    # TODO оптимизировать код под использоавние класса Refueling
+    # TODO оптимизировать код под использование класса Refueling
 
 
 def add_refueling(message: types.Message, cars: list = None, selected_car: str = None):

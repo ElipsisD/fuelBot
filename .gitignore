@@ -7,3 +7,4 @@ TestFolder/
 /.idea/
 *.db
 *.json
+/.env
