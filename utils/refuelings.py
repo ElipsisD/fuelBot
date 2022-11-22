@@ -13,33 +13,26 @@ class Refueling(NamedTuple):
     """Структура данных о новой заправке"""
     date: str
     car: str
-    odo: int
+    odo: int | None
     filing_volume: float
     # TODO оптимизировать код под использование класса Refueling
 
 
-def add_refueling(message: types.Message, cars: list = None, selected_car: str = None):
+def add_refueling(message: types.Message, ref_mode: str, selected_car: str = None):
     """Добавление новой заправки в БД"""
     user_id = str(message.from_user.id)
-    odo, filing_volume = _parse_message(message.text)
-    if cars:
-        db.set_new_data({
-            user_id: {
-                'username': message.from_user.username,
-                'first_name': message.from_user.first_name,
-                'cars': cars,
-                'refuelings': [
-                    {
-                        'date': strtime.get_now_formatted(),
-                        'car': selected_car,
-                        'odo': odo,
-                        'filing_volume': filing_volume
-                    }
-                ]
-            }
-        })
+    if ref_mode == 'full':
+        odo, filing_volume = _parse_message(message.text)
+        if last_ref := db.get_last_odo_on_car(user_id, selected_car): # else первая заправка на этом автомобиле
+            if last_ref > odo:
+                raise exceptions.NotCorrectRefueling(
+                    f'Пробег с последнего раза не увеличился!\n'
+                    f'В прошлый раз было {last_ref} км\n'
+                    f'Попробуй еще раз'
+                )
     else:
-        db.new_refueling(user_id, selected_car, odo, filing_volume)
+        odo, filing_volume = 0, float(message.text.replace(',', '.').strip())
+    db.new_refueling(user_id, selected_car, odo, filing_volume)
 
 
 def _parse_message(raw_message: str) -> tuple:
@@ -49,7 +42,8 @@ def _parse_message(raw_message: str) -> tuple:
             or not regexp_result.group(1) or not regexp_result.group(2):
         raise exceptions.NotCorrectRefueling(
             "Не могу понять сообщение. Напишите сообщение в формате, например:"
-            "\n23,54 68900")
+            "\n23,54 68900"
+        )
     filing_volume = float(regexp_result.group(1).replace(',', '.'))
     odo = int(regexp_result.group(2))
     return odo, filing_volume

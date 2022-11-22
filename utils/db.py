@@ -50,8 +50,9 @@ def user_cars(user_id: str) -> list:
     return data[user_id]['cars']
 
 
-# def get_user_data(user_id) -> dict:
-#     """Возвращает объект БД, связанный с пользователем
-#     и удаляет его из БД"""
-#     data = get_data()
-#     return data[user_id]
+def get_last_odo_on_car(user_id: str, car: str) -> int:
+    """Возвращает последний пробег на автомобиле либо 0"""
+    for ref in get_data()[user_id]['refuelings'][::-1]:
+        if ref['car'] == car and ref['odo'] != 0:
+            return ref['odo']
+    return 0
