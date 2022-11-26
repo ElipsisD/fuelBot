@@ -1,37 +1,41 @@
 """Работа с сообщениями от новых пользователей пользователя"""
-import logging
-import re
 
 from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 
-from filters.filters_for_user import OnlyKeys, NewUser
-from keyboards.Inlinenew import new_key
+from filters.filters_for_user import NewUser
+from keyboards.menu_bot import for_new_user_menu, menu
 from misc.states import FSMNewRefueling
-from utils import db, strtime, exceptions, refuelings
+from utils import db
 
 
-async def welcome(message: types.Message):
-    await message.answer(f"Привет, {message.from_user.first_name}!\n\n"
-                         f"это сообщение для новеньких",
-                         reply_markup=new_key)
-    # TODO Добавить инлайн-кнопку /new
-    #  Необходимо ввести фильтр для определения новых пользователей и создать отдельные хендлеры (в отдельном файле) для их обработки
-    # TODO Добавить эмодзи
-    # TODO на этапе получения списка авто надо добавить пользователя в базу отдельной функцией, чтобы отделить работу с новым пользователя
+async def welcome(m: types.Message):
+    await m.answer(f"Привет, {m.from_user.first_name}!\n\n"
+                   f"Когда будешь готов жми на кнопку!\n",
+                   reply_markup=for_new_user_menu)
+    await m.delete()
 
-async def adding_car(message: types.Message, state: FSMContext, text):
-    cars_list = re.split(r'\s*[ ,.;]\s*', message.text)
+
+async def cars_input(call: types.CallbackQuery, state: FSMContext):
+    await FSMNewRefueling.adding_car.set()
+    await call.message.edit_text('Введите название вашего автомобиля!\n')
     async with state.proxy() as context_data:
-        context_data['cars'] = cars_list
-        if len(cars_list) > 1:
-            await FSMNewRefueling.choice_of_car.set()
-            await message.answer("Какой автомобиль заправляем?", reply_markup=cars_key(cars_list))
-        else:
-            context_data['selected car'] = cars_list[0]
-            await FSMNewRefueling.data.set()
-            await message.answer('Введите данные о заправке')
+        context_data['message'] = call.message
+
+
+async def adding_car(m: types.Message, state: FSMContext):
+    db.set_new_data(m)
+    async with state.proxy() as context_data:
+        prev_m = context_data['message']
+    await m.delete()
+    await prev_m.edit_text('Вы успешно зарегистрировались\n'
+                           'Если у вас несколько автомобилей можете добавить их в разделе МОИ АВТОМОБИЛИ\n'
+                           'Удачного пользования, если у вас появятся вопросы обязательно свяжитесь с разработчиком!')
+    await prev_m.edit_reply_markup(reply_markup=menu)
+    await state.finish()
 
 
 def register_new_user(dp: Dispatcher):
+    dp.register_callback_query_handler(cars_input, NewUser())
+    dp.register_message_handler(adding_car, NewUser(), state=FSMNewRefueling.adding_car)
     dp.register_message_handler(welcome, NewUser(), commands=['start', 'help'], state='*')

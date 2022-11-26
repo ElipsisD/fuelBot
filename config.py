@@ -4,7 +4,7 @@ from environs import Env
 @dataclass
 class TgBot:
     token: str
-    admin_ids: list[int]
+    admin_id: list[int]
     use_redis: bool
 
 
@@ -35,7 +35,7 @@ def load_config(path: str = None):
     return Config(
         tg_bot=TgBot(
             token=env.str("API_TOKEN"),
-            admin_ids=env.int("ADMIN"),
+            admin_id=env.int("ADMIN"),
             use_redis=env.bool("USE_REDIS")
         )
     )
