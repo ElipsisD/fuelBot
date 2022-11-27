@@ -39,3 +39,4 @@ def register_new_user(dp: Dispatcher):
     dp.register_callback_query_handler(cars_input, NewUser())
     dp.register_message_handler(adding_car, NewUser(), state=FSMNewRefueling.adding_car)
     dp.register_message_handler(welcome, NewUser(), commands=['start', 'help'], state='*')
+

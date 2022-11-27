@@ -23,11 +23,11 @@ menu = InlineKeyboardMarkup(inline_keyboard=[
         callback_data='stat'
     )],
     [InlineKeyboardButton(
-        text='🚗МОИ АВТОМОБИЛИ🚗',
+        text='🚗ГАРАЖ🚗',
         callback_data='action menu cars'
     )],
     [InlineKeyboardButton(
-        text='📱СВЯЗАТЬСЯ С РАЗРАБОТЧИКОМ📱',
+        text='📱ОБРАТНАЯ СВЯЗЬ📱',
         url='https://t.me/bkdmitry',  # TODO сделать грамотный импорт из config
         switch_inline_query_current_chat='true'
     )]

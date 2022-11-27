@@ -4,7 +4,7 @@ from typing import NamedTuple
 
 from aiogram import types
 
-from utils import strtime
+from datetime import datetime
 from . import db
 from . import exceptions
 
@@ -54,6 +54,8 @@ def last_fuel_expense(user_id: str, car: str) -> str:
     if refs := db.get_two_last_ref_on_car(user_id, car):
         distance = refs[0]['odo'] - refs[1]['odo']  # Пройденная дистанция
         expense = round(refs[0]['filing_volume'] / distance * 100, 2)  # Расход
-        return f'Расход после последней заправки: {expense} л/100км'
+        return f'🚗  {car}\n\n' \
+               f'📅  {datetime.fromisoformat(refs[0]["date"]).strftime("%d.%m.%Y %H:%M")}\n\n' \
+               f'📊  <b>{expense}</b> л/100км'
     else:
-        return 'Это первая заправка на этом автомобиле, расход будет понятен в следующий раз'
+        return 'Для оценки расхода необходимо заправиться до полного бака минимум 2 раза 🗿'
