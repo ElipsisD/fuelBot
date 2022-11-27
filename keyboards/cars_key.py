@@ -10,20 +10,41 @@ def make_callback_actions_menu(mode='', car=''):
                             car=car)
 
 
-actions_with_cars = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(
-        text='🆕ДОБАВИТЬ АВТО🆕',
-        callback_data=make_callback_actions_menu(mode='add car')
-    )],
-    [InlineKeyboardButton(
-        text='🚮УДАЛИТЬ АВТО🚮',
-        callback_data=make_callback_actions_menu(mode='delete car')
-    )],
-    [InlineKeyboardButton(
-        text='↩назад',
-        callback_data='menu'
-    )]
-])
+def actions_with_cars(cars: list):
+    markup = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(
+            text='🆕ДОБАВИТЬ АВТО🆕',
+            callback_data=make_callback_actions_menu(mode='add car')
+        )]
+    ])
+    if len(cars) > 1:
+        markup.row(
+            InlineKeyboardButton(
+                text='🚮УДАЛИТЬ АВТО🚮',
+                callback_data=make_callback_actions_menu(mode='delete car')
+            ))
+    markup.row(
+        InlineKeyboardButton(
+            text='↩назад',
+            callback_data='menu'
+        ))
+    return markup
+
+
+# actions_with_cars = InlineKeyboardMarkup(inline_keyboard=[
+#     [InlineKeyboardButton(
+#         text='🆕ДОБАВИТЬ АВТО🆕',
+#         callback_data=make_callback_actions_menu(mode='add car')
+#     )],
+#     [InlineKeyboardButton(
+#         text='🚮УДАЛИТЬ АВТО🚮',
+#         callback_data=make_callback_actions_menu(mode='delete car')
+#     )],
+#     [InlineKeyboardButton(
+#         text='↩назад',
+#         callback_data='menu'
+#     )]
+# ])
 
 
 def actions_cars_key(cars: list) -> InlineKeyboardMarkup:
@@ -36,6 +57,8 @@ def actions_cars_key(cars: list) -> InlineKeyboardMarkup:
         ],
     )
     markup.row(
-        InlineKeyboardButton(text='↩назад', callback_data='menu')
+        InlineKeyboardButton(
+            text='↩назад',
+            callback_data='menu')
     )
     return markup

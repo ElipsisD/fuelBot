@@ -11,11 +11,8 @@ from utils.exceptions import NotCorrectCarName
 
 async def menu_cars_cmd(call: types.CallbackQuery):
     cars = db.user_cars(str(call.from_user.id))
-    if len(cars) == 1:
-        await call.message.edit_text(cars[0])
-    else:
-        await call.message.edit_text('\n'.join(cars))
-    await call.message.edit_reply_markup(reply_markup=actions_with_cars)
+    await call.message.edit_text('\n'.join(cars))
+    await call.message.edit_reply_markup(reply_markup=actions_with_cars(cars))
 
 
 async def adding_car(call: types.CallbackQuery, state: FSMContext):
