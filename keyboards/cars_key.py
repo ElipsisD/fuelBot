@@ -31,22 +31,6 @@ def actions_with_cars(cars: list):
     return markup
 
 
-# actions_with_cars = InlineKeyboardMarkup(inline_keyboard=[
-#     [InlineKeyboardButton(
-#         text='🆕ДОБАВИТЬ АВТО🆕',
-#         callback_data=make_callback_actions_menu(mode='add car')
-#     )],
-#     [InlineKeyboardButton(
-#         text='🚮УДАЛИТЬ АВТО🚮',
-#         callback_data=make_callback_actions_menu(mode='delete car')
-#     )],
-#     [InlineKeyboardButton(
-#         text='↩назад',
-#         callback_data='menu'
-#     )]
-# ])
-
-
 def actions_cars_key(cars: list) -> InlineKeyboardMarkup:
     """Клавиатура для выбора автомобиля"""
     markup = InlineKeyboardMarkup(

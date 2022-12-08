@@ -6,6 +6,7 @@ class TgBot:
     token: str
     admin_id: list[int]
     use_redis: bool
+    logs_chat: int
 
 
 @dataclass
@@ -36,6 +37,7 @@ def load_config(path: str = None):
         tg_bot=TgBot(
             token=env.str("API_TOKEN"),
             admin_id=env.int("ADMIN"),
-            use_redis=env.bool("USE_REDIS")
+            use_redis=env.bool("USE_REDIS"),
+            logs_chat=env.int("LOGS_CHAT_ID"),
         )
     )

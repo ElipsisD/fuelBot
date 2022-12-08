@@ -1,4 +1,5 @@
 """Работа с сообщениями от новых пользователей пользователя"""
+import logging
 
 from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
@@ -7,6 +8,8 @@ from filters.filters_for_user import NewUser
 from keyboards.menu_bot import for_new_user_menu, menu
 from misc.states import FSMNewRefueling
 from utils import db
+
+logger = logging.getLogger('telegram_logger')
 
 
 async def welcome(m: types.Message):
@@ -31,6 +34,7 @@ async def adding_car(m: types.Message, state: FSMContext):
     await prev_m.edit_text('Вы успешно зарегистрировались\n'
                            'Если у вас несколько автомобилей можете добавить их в разделе МОИ АВТОМОБИЛИ\n'
                            'Удачного пользования, если у вас появятся вопросы обязательно свяжитесь с разработчиком!')
+    logger.info(f'{m.from_user.first_name} ({m.from_user.id}) зарегистрировался')
     await prev_m.edit_reply_markup(reply_markup=menu)
     await state.finish()
 
@@ -39,4 +43,3 @@ def register_new_user(dp: Dispatcher):
     dp.register_callback_query_handler(cars_input, NewUser())
     dp.register_message_handler(adding_car, NewUser(), state=FSMNewRefueling.adding_car)
     dp.register_message_handler(welcome, NewUser(), commands=['start', 'help'], state='*')
-

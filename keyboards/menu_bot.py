@@ -42,7 +42,7 @@ back_key = InlineKeyboardMarkup(inline_keyboard=[
 
 for_new_user_menu = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(
-        text='🆕РЕГИСТАРЦИЯ🆕',
+        text='🆕РЕГИСТРАЦИЯ🆕',
         callback_data='reg'
     )],
 ])

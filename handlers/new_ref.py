@@ -3,11 +3,14 @@ import logging
 
 from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
+from aiogram.types import ReplyKeyboardRemove
 
 from keyboards.menu_bot import back_key, menu, menu_cd
 from keyboards.ref_key import cars_key, refueling_mode
 from misc.states import FSMNewRefueling
 from utils import db, strtime, refuelings, exceptions
+
+logger = logging.getLogger('telegram_logger')
 
 
 async def new_cmd(call: types.CallbackQuery):
@@ -51,10 +54,13 @@ async def data_handler(m: types.Message, state: FSMContext):
         ref_mode = context_data['mode']
     try:
         refuelings.add_refueling(m, ref_mode=ref_mode, selected_car=car)
-        answer = refuelings.last_fuel_expense(str(m.from_user.id), car=car)
-        answer = answer if ref_mode == 'full' else 'Успешно 👌'
+        if ref_mode == 'full':
+            answer = refuelings.last_fuel_expense(str(m.from_user.id), car=car)
+        else:
+            answer = refuelings.volume_since_last_full_fill(str(m.from_user.id), car=car)
         await prev_m.edit_text(answer)
-        await prev_m.edit_reply_markup(reply_markup=menu)
+        await m.answer(f"⬇<b>{m.from_user.first_name}</b>, выбирай⬇", reply_markup=menu)
+        logger.info(f'{m.from_user.first_name} заправил:\n{answer}')
         await m.delete()
         await state.finish()
     except exceptions.NotCorrectRefueling as e:

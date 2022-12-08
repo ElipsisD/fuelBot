@@ -1,13 +1,16 @@
 """Работа с сообщениями от пользователя"""
+import logging
 
 from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 
 from keyboards.menu_bot import menu
 
+logger = logging.getLogger('telegram_logger')
 
 async def send_welcome(m: types.Message):
     """Отправляем пользователю кнопки меню и приветственный текст"""
+    logger.info(f'{m.from_user.first_name} ({m.from_user.id}) ввел команду start')
     await m.answer(f"Привет, {m.from_user.first_name}!\n\n"
                    f"Этот бот создан для ведения статистики расхода топлива твоего автомобиля\n"
                    f"Для корректных расчетов необходимо заправляться до полного бака\n",

@@ -1,9 +1,13 @@
 """Работа с меню СТАТИСТИКА"""
+import logging
+
 from aiogram import types, Dispatcher
 
 from keyboards.menu_bot import menu
 from keyboards.stat_key import stat_cars_key, stat_menu, stat_menu_cb
 from utils import db, refuelings
+
+logger = logging.getLogger('telegram_logger')
 
 
 async def stat_choice(call: types.CallbackQuery):
@@ -25,7 +29,9 @@ async def stat_mode_choice(call: types.CallbackQuery, callback_data: dict):
 
 
 async def get_last_car_stat(call: types.CallbackQuery, callback_data: dict):
-    answer = refuelings.last_fuel_expense(str(call.from_user.id), callback_data.get('car'))
+    car = callback_data.get('car')
+    answer = refuelings.last_fuel_expense(str(call.from_user.id), car)
+    logger.info(f'{call.from_user.first_name} посмотрел свой последний расход на {car}')
     await call.message.edit_text(answer)
     await call.message.edit_reply_markup(reply_markup=menu)
 

@@ -53,11 +53,25 @@ def get_last_odo_on_car(user_id: str, car: str) -> int:
     return 0
 
 
-def get_two_last_ref_on_car(user_id: str, car: str) -> list:
-    """Возвращает массив с информацией о 2-х последних заправках"""
-    res = [ref for ref in get_data()[user_id]['refuelings'][::-1] if ref['car'] == car and ref['odo'] != 0]
-    if len(res) >= 2:
-        return res
+def get_two_last_full_ref_on_car(user_id: str, car: str) -> list:
+    """Возвращает массив с информацией о заправках между последними 2-мя полными заправками"""
+    refuelings = [ref for ref in get_data()[user_id]['refuelings'] if ref['car'] == car]
+    res = [refuelings[-1]]
+    for ref in refuelings[-2::-1]:
+        res.append(ref)
+        if ref['odo'] != 0:
+            return res
+    return []
+
+
+def get_last_partial_ref_on_car(user_id: str, car: str) -> list:
+    """Возвращает массив с информацией о последних частичных заправках"""
+    refuelings = [ref for ref in get_data()[user_id]['refuelings'] if ref['car'] == car]
+    res = []
+    for ref in refuelings[::-1]:
+        if ref['odo'] != 0:
+            return res
+        res.append(ref)
     return []
 
 
