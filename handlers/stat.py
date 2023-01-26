@@ -2,15 +2,18 @@
 import logging
 
 from aiogram import types, Dispatcher
+from aiogram.types import InputFile
 
-from keyboards.menu_bot import menu
+from keyboards.menu_bot import menu, back_key
 from keyboards.stat_key import stat_cars_key, stat_menu, stat_menu_cb
-from utils import db, refuelings
+from utils import db, refuelings, exceptions
+from utils.refuelings import graph_stat
 
 logger = logging.getLogger('telegram_logger')
 
 
 async def stat_choice(call: types.CallbackQuery):
+    """Выбор автомобиля"""
     cars_list = db.user_cars(str(call.from_user.id))
 
     if len(cars_list) > 1:
@@ -23,12 +26,14 @@ async def stat_choice(call: types.CallbackQuery):
 
 
 async def stat_mode_choice(call: types.CallbackQuery, callback_data: dict):
+    """Выбор вида аналитики"""
     car = callback_data.get('car')
     await call.message.edit_text("Что интересно?")
     await call.message.edit_reply_markup(reply_markup=stat_menu(car))
 
 
 async def get_last_car_stat(call: types.CallbackQuery, callback_data: dict):
+    """Отправка последнего расхода на автомобиле"""
     car = callback_data.get('car')
     answer = refuelings.last_fuel_expense(str(call.from_user.id), car)
     logger.info(f'{call.from_user.first_name} посмотрел свой последний расход на {car}')
@@ -36,8 +41,25 @@ async def get_last_car_stat(call: types.CallbackQuery, callback_data: dict):
     await call.message.edit_reply_markup(reply_markup=menu)
 
 
+async def get_graph_stat(call: types.CallbackQuery, callback_data: dict):
+    """Отправка графика расхода топлива на автомобиле за все заправки"""
+    car = callback_data.get('car')
+    try:
+        photo_url = graph_stat(str(call.from_user.id), car)
+        logger.info(f'{call.from_user.first_name} посмотрел график расхода на {car}')
+        await call.message.edit_text('⬇График за весь период заправок⬇')
+        await call.message.answer_photo(photo_url)
+        await call.message.answer(f"⬇<b>{call.from_user.first_name}</b>, выбирай⬇", reply_markup=menu)
+
+    except exceptions.NotEnoughRefuelings as e:
+        await call.message.edit_text(str(e))
+        await call.message.edit_reply_markup(reply_markup=back_key)
+
+
+
 def register_user_stat(dp: Dispatcher):
     """Регистрация хендлеров"""
     dp.register_callback_query_handler(stat_choice, text='stat')
     dp.register_callback_query_handler(stat_mode_choice, stat_menu_cb.filter(mode='car choice'))
     dp.register_callback_query_handler(get_last_car_stat, stat_menu_cb.filter(mode='mode choice'))
+    dp.register_callback_query_handler(get_graph_stat, stat_menu_cb.filter(mode='graph'))

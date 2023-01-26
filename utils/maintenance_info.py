@@ -1,0 +1,39 @@
+"""Работа с информацией о ТО (парсинг, формирование сообщений)"""
+import re
+from datetime import datetime
+
+from utils import db, exceptions
+
+
+def make_maintenance_info(user_id: str, car: str) -> str:
+    """Создание сообщения с данными о последнем ТО и предстоящем ТО для определенного автомобиля"""
+    try:
+        last_maintenance = db.get_last_maintenance(user_id, car)
+        if service_interval := db.get_service_interval(user_id):
+            next_maintenance = last_maintenance.odo + service_interval
+        else:
+            service_interval = next_maintenance = 'NOT FOUND'
+        return f'Последнее ТО:\n\n' \
+               f'🚗  {car}\n\n' \
+               f'📅  {datetime.fromisoformat(last_maintenance.date).strftime("%d.%m.%Y")}\n\n' \
+               f'📟  {last_maintenance.odo} км\n\n' \
+               f'Следующее ТО: <b>{next_maintenance} км</b>\n\n' \
+               f'Установленный интервал {service_interval} км'
+    except exceptions.NotFoundMaintenance as e:
+        return e
+
+
+def parse_maintenance_date(text: str) -> str:
+    """Парсит дату ТО"""
+    regexp_result = re.fullmatch(r"\W*(\d{2})\W+(\d{2})\W+(\d{2})\W*", text)
+    if not regexp_result or int(regexp_result.group(1)) > 31 or int(regexp_result.group(2)) > 12:
+        raise exceptions.NotCorrectData("Некорректное значение! Введите дату в формате:\n\n<b>ДД.ММ.ГГ</b>")
+    return f'20{regexp_result.group(3)}-{regexp_result.group(2)}-{regexp_result.group(1)}'
+
+
+def parse_maintenance_number(text: str) -> int:
+    """Парсит числа: пробег ТО, или интервал ТО"""
+    regexp_result = re.fullmatch(r"\W*(\d+)\W*", text)
+    if not regexp_result:
+        raise exceptions.NotCorrectNumber("Некорректное значение! Попробуйте еще раз.")
+    return int(regexp_result.group(1))

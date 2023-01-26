@@ -1,25 +1,25 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
 
-stat_menu_cb = CallbackData('Stat', 'mode', 'car')
+maintenance_menu_cb = CallbackData('Maintenance', 'mode', 'car')
 
 
-def make_callback_stat_menu(mode='', car=''):
+def make_callback_maintenance_menu(mode='', car=''):
     """Создание объекта CallbackData для хранения данных и отлавливания состояний"""
-    return stat_menu_cb.new(mode=mode,
+    return maintenance_menu_cb.new(mode=mode,
                             car=car)
 
 
-def stat_menu(car: str):
-    """Клавиатура вариантов статистики с информацией об автомобиле"""
+def maintenance_menu(car: str):
+    """Клавиатура вариантов работы с информацией о ТехОбслуживании"""
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
-            text='◀ПОСЛЕДНИЙ РАСЧЕТ▶',
-            callback_data=make_callback_stat_menu(mode='mode choice', car=car)
+            text='◀НОВОЕ ТО▶',
+            callback_data=make_callback_maintenance_menu(mode='new', car=car)
         )],
         [InlineKeyboardButton(
-            text='◀ГРАФИК РАСХОДА ТОПЛИВА▶',
-            callback_data=make_callback_stat_menu(mode='graph', car=car)
+            text='◀ИЗМЕНИТЬ ИНТЕРВАЛ▶',
+            callback_data=make_callback_maintenance_menu(mode='interval', car=car)
         )],
         [InlineKeyboardButton(
             text='↩назад',
@@ -28,12 +28,12 @@ def stat_menu(car: str):
     ])
 
 
-def stat_cars_key(cars: list) -> InlineKeyboardMarkup:
+def maintenance_key(cars: list) -> InlineKeyboardMarkup:
     """Клавиатура для выбора автомобиля"""
     markup = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text=car,
-                                  callback_data=make_callback_stat_menu(car=car, mode='car choice'))]
+                                  callback_data=make_callback_maintenance_menu(car=car, mode='car choice'))]
             for car in cars
         ],
     )
