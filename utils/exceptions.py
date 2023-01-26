@@ -9,3 +9,23 @@ class NotCorrectRefueling(Exception):
 class NotCorrectCarName(Exception):
     """Некорректное имя автомобиля"""
     pass
+
+
+class NotEnoughRefuelings(Exception):
+    """Недостаточное количество заправок"""
+    pass
+
+
+class NotCorrectData(Exception):
+    """Некорректная дата"""
+    pass
+
+
+class NotCorrectNumber(Exception):
+    """Некорректный пробег"""
+    pass
+
+
+class NotFoundMaintenance(Exception):
+    """Данные о ТО отсутствуют"""
+    pass

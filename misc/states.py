@@ -9,3 +9,9 @@ class FSMNewRefueling(StatesGroup):
 
 class FSMActions(StatesGroup):
     new_car_name = State()
+
+
+class FSMMaintenance(StatesGroup):
+    new_service_interval = State()
+    new_maintenance_date = State()
+    new_maintenance_odo = State()

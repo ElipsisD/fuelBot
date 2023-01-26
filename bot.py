@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import logging.config
+from datetime import datetime
 
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -8,13 +9,15 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from config import load_config
 from filters.filters_for_user import NewUser
 from handlers.logs import register_logs
+from handlers.maintenance import register_user_maintenance
 from handlers.my_cars import register_user_my_cars
 from handlers.new_ref import register_user_new_ref
 from handlers.new_user import register_new_user
 from handlers.stat import register_user_stat
 from handlers.user import register_user
 from misc.logging import logger_config
-
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from tzlocal import get_localzone
 
 async def on_startup(bot: Bot, logs_chat):
     await bot.send_message(logs_chat, 'Бот запущен!')
@@ -29,6 +32,7 @@ def register_all_filters(disp: Dispatcher):
 
 
 def register_all_handlers(disp: Dispatcher):
+    register_user_maintenance(disp)
     register_new_user(disp)
     register_user_new_ref(disp)
     register_user_my_cars(disp)
@@ -36,6 +40,8 @@ def register_all_handlers(disp: Dispatcher):
     register_logs(disp)
     register_user(disp)
 
+async def schedule(bot: Bot, logs_chat):
+    await bot.send_message(logs_chat, 'Работа выполнена в определенный срок')
 
 async def main():
     # logging.basicConfig(level=logging.INFO,
@@ -52,7 +58,11 @@ async def main():
     # register_all_middlewares(dp)
     register_all_filters(dp)
     register_all_handlers(dp)
+
+    # scheduler = AsyncIOScheduler(timezone=str(get_localzone()))
+    # scheduler.add_job(schedule, 'interval', seconds=10, args=(bot, config.tg_bot.logs_chat))
     try:
+        # scheduler.start()
         await on_startup(bot, config.tg_bot.logs_chat)
         await dp.skip_updates()
         await bot.get_session()
