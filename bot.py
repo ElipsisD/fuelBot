@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import logging.config
-from datetime import datetime
 
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -16,8 +15,8 @@ from handlers.new_user import register_new_user
 from handlers.stat import register_user_stat
 from handlers.user import register_user
 from misc.logging import logger_config
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from tzlocal import get_localzone
+# from apscheduler.schedulers.asyncio import AsyncIOScheduler
+# from tzlocal import get_localzone
 
 async def on_startup(bot: Bot, logs_chat):
     await bot.send_message(logs_chat, 'Бот запущен!')
