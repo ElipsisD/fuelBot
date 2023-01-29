@@ -11,16 +11,22 @@ def make_maintenance_info(user_id: str, car: str) -> str:
         last_maintenance = db.get_last_maintenance(user_id, car)
         if service_interval := db.get_service_interval(user_id):
             next_maintenance = last_maintenance.odo + service_interval
+            last_odo = db.get_last_odo_on_car(user_id, car)
+            until_next_maintenance = next_maintenance - last_odo
+            if until_next_maintenance < 0:
+                until_next_maintenance = f'ТО просрочено на <b>{abs(until_next_maintenance)} км</b>'
+            else:
+                until_next_maintenance = f'Следующее ТО через <b>{until_next_maintenance} км</b>'
         else:
-            service_interval = next_maintenance = 'NOT FOUND'
+            service_interval = until_next_maintenance = 'NOT FOUND'
         return f'Последнее ТО:\n\n' \
                f'🚗  {car}\n\n' \
                f'📅  {datetime.fromisoformat(last_maintenance.date).strftime("%d.%m.%Y")}\n\n' \
                f'📟  {last_maintenance.odo} км\n\n' \
-               f'Следующее ТО: <b>{next_maintenance} км</b>\n\n' \
+               f'{until_next_maintenance}\n\n' \
                f'Установленный интервал {service_interval} км'
     except exceptions.NotFoundMaintenance as e:
-        return e
+        return str(e)
 
 
 def parse_maintenance_date(text: str) -> str:

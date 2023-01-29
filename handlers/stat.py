@@ -34,11 +34,15 @@ async def stat_mode_choice(call: types.CallbackQuery, callback_data: dict):
 
 async def get_last_car_stat(call: types.CallbackQuery, callback_data: dict):
     """Отправка последнего расхода на автомобиле"""
-    car = callback_data.get('car')
-    answer = refuelings.last_fuel_expense(str(call.from_user.id), car)
-    logger.info(f'{call.from_user.first_name} посмотрел свой последний расход на {car}')
-    await call.message.edit_text(answer)
-    await call.message.edit_reply_markup(reply_markup=menu)
+    try:
+        car = callback_data.get('car')
+        answer = refuelings.last_fuel_expense(str(call.from_user.id), car)
+        logger.info(f'{call.from_user.first_name} посмотрел свой последний расход на {car}')
+        await call.message.edit_text(answer)
+        await call.message.edit_reply_markup(reply_markup=menu)
+    except exceptions.NotEnoughRefuelings as e:
+        await call.message.edit_text(str(e))
+        await call.message.edit_reply_markup(reply_markup=menu)
 
 
 async def get_graph_stat(call: types.CallbackQuery, callback_data: dict):

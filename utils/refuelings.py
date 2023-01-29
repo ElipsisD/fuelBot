@@ -32,8 +32,8 @@ def _parse_message(raw_message: str) -> tuple:
     if not regexp_result or not regexp_result.group(0) \
             or not regexp_result.group(1) or not regexp_result.group(2):
         raise exceptions.NotCorrectRefueling(
-            "Не могу понять сообщение. Напишите сообщение в формате, например:"
-            "\n23,54 68900"
+            "Не могу понять сообщение. Напишите сообщение в формате, например:\n"
+            "<b>23,54 68900</b>"
         )
     filing_volume = float(regexp_result.group(1).replace(',', '.'))
     odo = int(regexp_result.group(2))
@@ -46,9 +46,12 @@ def last_fuel_expense(user_id: str, car: str) -> str:
         distance = refs[0]['odo'] - refs[-1]['odo']  # Пройденная дистанция
         spent_fuel = sum(i['filing_volume'] for i in refs[:-1])
         expense = round(spent_fuel / distance * 100, 2)  # Расход
-        return f'🚗  {car}\n\n' \
-               f'📅  {datetime.fromisoformat(refs[0]["date"]).strftime("%d.%m.%Y %H:%M")}\n\n' \
-               f'📊  <b>{expense}</b> л / 100 км'
+        answer = f'🚗  {car}\n\n' \
+                 f'📅  {datetime.fromisoformat(refs[0]["date"]).strftime("%d.%m.%Y %H:%M")}\n\n' \
+                 f'📊  <b>{expense}</b> л / 100 км'
+        if until := get_distance_to_maintenance(user_id, car):
+            answer += '\n\n' + until
+        return answer
     else:
         raise exceptions.NotEnoughRefuelings(
             'Для оценки расхода необходимо заправиться до полного бака минимум 2 раза 🗿')
@@ -60,7 +63,7 @@ def volume_since_last_full_fill(user_id: str, car: str) -> str:
     volume = round(sum(ref['filing_volume'] for ref in refs))
     return f'🚗  {car}\n\n' \
            f'📅  {datetime.fromisoformat(refs[0]["date"]).strftime("%d.%m.%Y %H:%M")}\n\n' \
-           f'⛽  Заправил уже {volume} л'
+           f'⛽  Заправил уже <b>{volume}</b> л'
 
 
 def graph_stat(user_id: str, car: str) -> types.InputFile:
@@ -101,3 +104,16 @@ def _get_data_for_graph(user_id: str, car: str) -> tuple:
             'Для оценки расхода необходимо заправиться до полного бака минимум 2 раза 🗿')
 
 
+def get_distance_to_maintenance(user_id: str, car: str) -> str:
+    """Формирует строку о том, сколько осталось км до ТО на данном автомобиле пользователя"""
+    last_maintenance = db.get_last_maintenance(user_id, car)
+    if service_interval := db.get_service_interval(user_id):
+        next_maintenance = last_maintenance.odo + service_interval
+        last_odo = db.get_last_odo_on_car(user_id, car)
+        until_next_maintenance = next_maintenance - last_odo
+        if until_next_maintenance < 0:
+            return f'ТО просрочено на <b>{abs(until_next_maintenance)} км</b>'
+        else:
+            return f'Следующее ТО через <b>{until_next_maintenance} км</b>'
+    else:
+        return ''
