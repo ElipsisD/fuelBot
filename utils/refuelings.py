@@ -50,7 +50,10 @@ def last_fuel_expense(user_id: str, car: str) -> str:
                  f'📅  {datetime.fromisoformat(refs[0]["date"]).strftime("%d.%m.%Y %H:%M")}\n\n' \
                  f'📊  <b>{expense}</b> л / 100 км'
         if until := get_distance_to_maintenance(user_id, car):
-            answer += '\n\n' + until
+            if 0 < until < 500:
+                answer += '\n\n' + f'Следующее ТО через <b>{until} км</b>'
+            elif until < 0:
+                answer += '\n\n' + f'ТО просрочено на <b>{abs(until)} км</b>'
         return answer
     else:
         raise exceptions.NotEnoughRefuelings(
@@ -104,16 +107,14 @@ def _get_data_for_graph(user_id: str, car: str) -> tuple:
             'Для оценки расхода необходимо заправиться до полного бака минимум 2 раза 🗿')
 
 
-def get_distance_to_maintenance(user_id: str, car: str) -> str:
-    """Формирует строку о том, сколько осталось км до ТО на данном автомобиле пользователя"""
-    last_maintenance = db.get_last_maintenance(user_id, car)
-    if service_interval := db.get_service_interval(user_id):
-        next_maintenance = last_maintenance.odo + service_interval
-        last_odo = db.get_last_odo_on_car(user_id, car)
-        until_next_maintenance = next_maintenance - last_odo
-        if until_next_maintenance < 0:
-            return f'ТО просрочено на <b>{abs(until_next_maintenance)} км</b>'
-        else:
-            return f'Следующее ТО через <b>{until_next_maintenance} км</b>'
-    else:
-        return ''
+def get_distance_to_maintenance(user_id: str, car: str) -> int | None:
+    """Вычисляет сколько осталось км до ТО на данном автомобиле пользователя"""
+    try:
+        last_maintenance = db.get_last_maintenance(user_id, car)
+        if service_interval := db.get_service_interval(user_id):
+            next_maintenance = last_maintenance.odo + service_interval
+            last_odo = db.get_last_odo_on_car(user_id, car)
+            return next_maintenance - last_odo
+        return None
+    except exceptions.NotFoundMaintenance:
+        return None
