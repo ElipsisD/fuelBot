@@ -160,6 +160,7 @@ def set_service_interval(user_id: str, interval: int) -> None:
     data[user_id]['service_interval'] = interval
     set_data(data)
 
+
 def new_maintenance(user_id: str, info: Maintenance) -> None:
     """Добавление данных о новом ТО для определенной машины пользователя"""
     data = get_data()

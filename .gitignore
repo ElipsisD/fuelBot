@@ -10,3 +10,4 @@ TestFolder/
 /.env
 users_graphs/*.png
 /for_tests.py
+*.log
