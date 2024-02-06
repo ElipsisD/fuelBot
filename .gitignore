@@ -11,3 +11,4 @@ TestFolder/
 users_graphs/*.png
 /for_tests.py
 logs/*.log
+fuelbot_venv
