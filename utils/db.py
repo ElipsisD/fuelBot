@@ -1,4 +1,5 @@
 """Работа с БД"""
+import datetime
 import json
 from pathlib import Path
 from typing import NamedTuple
@@ -179,3 +180,33 @@ def get_last_maintenance(user_id: str, car: str) -> Maintenance:
         return Maintenance(last_maintenance['date'], last_maintenance['car'], last_maintenance['odo'])
     except IndexError:
         raise exceptions.NotFoundMaintenance('Данные о ТО отсутствуют')
+
+
+def get_refuelings_list_for_month(user_id: str, car: str) -> list[Refueling]:
+    """Возвращает список Refueling объектов для определенной машины пользователя за последние 30 дней"""
+    timedelta = datetime.datetime.today() - datetime.timedelta(days=30)
+    return [
+        Refueling(
+            date=ref['date'],
+            odo=ref['odo'],
+            filing_volume=ref['filing_volume'],
+            car=car
+        )
+        for ref in get_data()[user_id]['refuelings']
+        if ref['car'] == car and datetime.datetime.fromisoformat(ref["date"]) >= timedelta
+    ]
+
+
+def get_refuelings_list_for_current_year(user_id: str, car: str) -> list[Refueling]:
+    """Возвращает список Refueling объектов для определенной машины пользователя с начала текущего года"""
+    today_year = datetime.datetime.today().year
+    return [
+        Refueling(
+            date=ref['date'],
+            odo=ref['odo'],
+            filing_volume=ref['filing_volume'],
+            car=car
+        )
+        for ref in get_data()[user_id]['refuelings']
+        if ref['car'] == car and datetime.datetime.fromisoformat(ref["date"]).year >= today_year
+    ]
