@@ -6,6 +6,7 @@ from aiogram import types
 
 from . import db
 from . import exceptions
+from .db import Refueling
 from .graphs_settings import make_graph_stat
 
 
@@ -118,3 +119,41 @@ def get_distance_to_maintenance(user_id: str, car: str) -> int | None:
         return None
     except exceptions.NotFoundMaintenance:
         return None
+
+
+def get_month_analytic(user_id: str, car: str) -> str:
+    """Вычисление аналитики за последние 30 дней"""
+    if refuelings := db.get_refuelings_list_for_month(user_id, car):
+        filing_volume_sum, odo_string = get_stat_for_period(refuelings)
+        return f'📊  За последние 30 дней\n\n' \
+               f'🚗  {car}\n\n' \
+               f'{odo_string}' \
+               f'⛽  заправлено <b>{filing_volume_sum}</b> л'
+    else:
+        return "Заправок пока что не было"
+
+
+def get_current_year_analytic(user_id: str, car: str) -> str:
+    """Вычисление аналитики с начала года"""
+    if refuelings := db.get_refuelings_list_for_current_year(user_id, car):
+        filing_volume_sum, odo_string = get_stat_for_period(refuelings)
+        return f'📊  С начала года\n\n' \
+               f'🚗  {car}\n\n' \
+               f'{odo_string}' \
+               f'⛽  заправлено <b>{filing_volume_sum}</b> л'
+    else:
+        return "Заправок пока что не было"
+
+
+def get_stat_for_period(data: list[Refueling]) -> tuple[int, str]:
+    """Подсчет аналитики по входным данным"""
+    filing_volume_sum = 0
+    odo_values = []
+    odo_string = ""
+    for refueling in data:
+        filing_volume_sum += refueling.filing_volume
+        odo_values.append(refueling.odo)
+    if len(odo_values) > 2:
+        odo_value = max(odo_values) - min(odo_values)
+        odo_string = f'📟  пройдено {odo_value} км\n\n'
+    return round(filing_volume_sum, 2), odo_string

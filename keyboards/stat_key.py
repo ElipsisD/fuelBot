@@ -18,6 +18,14 @@ def stat_menu(car: str):
             callback_data=make_callback_stat_menu(mode='mode choice', car=car)
         )],
         [InlineKeyboardButton(
+            text='◀ЗА ПОСЛЕДНИЕ 30 ДНЕЙ▶',
+            callback_data=make_callback_stat_menu(mode='month', car=car)
+        )],
+        [InlineKeyboardButton(
+            text='◀С НАЧАЛА ГОДА▶',
+            callback_data=make_callback_stat_menu(mode='year', car=car)
+        )],
+        [InlineKeyboardButton(
             text='◀ГРАФИК РАСХОДА ТОПЛИВА▶',
             callback_data=make_callback_stat_menu(mode='graph', car=car)
         )],

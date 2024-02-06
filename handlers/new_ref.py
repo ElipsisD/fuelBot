@@ -58,9 +58,9 @@ async def data_handler(m: types.Message, state: FSMContext):
             answer = refuelings.last_fuel_expense(str(m.from_user.id), car=car)
         else:
             answer = refuelings.volume_since_last_full_fill(str(m.from_user.id), car=car)
+        logger.info(f'{m.from_user.first_name} заправил:\n{answer}')
         await prev_m.edit_text(answer)
         await m.answer(f"⬇<b>{m.from_user.first_name}</b>, выбирай⬇", reply_markup=menu)
-        logger.info(f'{m.from_user.first_name} заправил:\n{answer}')
         try:
             update_graph_stat(str(m.from_user.id), car)
         except exceptions.NotEnoughRefuelings:
