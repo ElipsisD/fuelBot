@@ -3,9 +3,9 @@ import locale
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 from aiogram.types import InputFile
+from pathlib import Path
 
 locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
-from pathlib import Path
 
 path = Path('users_graphs')
 
@@ -42,4 +42,5 @@ def make_graph_stat(user_id: str, car: str, expenses: tuple) -> InputFile:
     plt.title(f'Аналитика расхода на {car}')
     graph_path = path.joinpath(f'{user_id}-{car}.png').as_posix()
     fig.savefig(graph_path)
+    plt.close(fig)
     return InputFile(graph_path)
