@@ -1,0 +1,23 @@
+name: Deploy to FuelBot
+
+on: workflow_dispatch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Restart FuelBot
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.IP_ADDRESS_OF_HOST }}
+          username: ${{ secrets.USER_OF_HOST }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT_OF_HOST }}
+          script: |
+            cd ~/fuelbot/
+            source fuelbot_venv/bin/activate
+            git pull
+            pip install -r requirements.txt
+            supervisorctl restart fuelbot
