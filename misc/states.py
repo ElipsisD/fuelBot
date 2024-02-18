@@ -14,3 +14,8 @@ class FSMActions(StatesGroup):
 class FSMMaintenance(StatesGroup):
     new_maintenance_date = State()
     new_maintenance_odo = State()
+
+
+class FSMSettings(StatesGroup):
+    new_service_interval = State()
+    change_last_refueling = State()
