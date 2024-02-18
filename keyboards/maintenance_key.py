@@ -6,8 +6,7 @@ maintenance_menu_cb = CallbackData('Maintenance', 'mode', 'car')
 
 def make_callback_maintenance_menu(mode='', car=''):
     """Создание объекта CallbackData для хранения данных и отлавливания состояний"""
-    return maintenance_menu_cb.new(mode=mode,
-                            car=car)
+    return maintenance_menu_cb.new(mode=mode, car=car)
 
 
 def maintenance_menu(car: str):
@@ -16,10 +15,6 @@ def maintenance_menu(car: str):
         [InlineKeyboardButton(
             text='◀НОВОЕ ТО▶',
             callback_data=make_callback_maintenance_menu(mode='new', car=car)
-        )],
-        [InlineKeyboardButton(
-            text='◀ИЗМЕНИТЬ ИНТЕРВАЛ▶',
-            callback_data=make_callback_maintenance_menu(mode='interval', car=car)
         )],
         [InlineKeyboardButton(
             text='↩назад',

@@ -36,33 +36,6 @@ async def mode_choice(call: types.CallbackQuery, callback_data: dict):
     await call.message.edit_reply_markup(reply_markup=maintenance_menu(car))
 
 
-async def change_interval(call: types.CallbackQuery, state: FSMContext):
-    """Реакция на кнопку НОВЫЙ ИНТЕРВАЛ"""
-    await FSMMaintenance.new_service_interval.set()
-    async with state.proxy() as context_data:
-        context_data['prev_m'] = call.message
-    await call.message.edit_text('Введите желаемый интервал сервисного обслуживания')
-    await call.message.edit_reply_markup(reply_markup=back_key)
-
-
-async def new_interval(m: types.Message, state: FSMContext):
-    """Валидация нового интервала и запись в БД"""
-    async with state.proxy() as context_data:
-        prev_m = context_data['prev_m']
-    try:
-        new_inter = maintenance_info.parse_maintenance_number(m.text)
-        db.set_service_interval(str(m.from_user.id), new_inter)
-        await prev_m.edit_text('Вы успешно изменили интервал сервисного обслуживания')
-        await prev_m.edit_reply_markup(reply_markup=menu)
-        logger.info(f'{m.from_user.first_name} изменил интервал сервисного обслуживания: {new_inter}')
-        await m.delete()
-        await state.finish()
-    except exceptions.NotCorrectNumber as e:
-        await m.delete()
-        await prev_m.edit_text(str(e))
-        await prev_m.edit_reply_markup(reply_markup=back_key)
-
-
 async def new_maintenance(call: types.CallbackQuery, state: FSMContext, callback_data: dict):
     """Реакция на кнопку НОВОЕ ТО"""
     await FSMMaintenance.new_maintenance_date.set()
@@ -79,7 +52,6 @@ async def date_handler(m: types.Message, state: FSMContext):
         prev_m = context_data['prev_m']
         try:
             date = maintenance_info.parse_maintenance_date(m.text)
-            print(date)
             context_data['date'] = date
             await prev_m.edit_text('Введите пробег автомобиля, на котором было проведено ТО')
             await prev_m.edit_reply_markup(reply_markup=back_key)
@@ -115,8 +87,6 @@ def register_user_maintenance(dp: Dispatcher):
     """Регистрация хендлеров"""
     dp.register_callback_query_handler(choice, text='maintenance')
     dp.register_callback_query_handler(mode_choice, maintenance_menu_cb.filter(mode='car choice'))
-    dp.register_callback_query_handler(change_interval, maintenance_menu_cb.filter(mode='interval'))
-    dp.register_message_handler(new_interval, state=FSMMaintenance.new_service_interval)
     dp.register_callback_query_handler(new_maintenance, maintenance_menu_cb.filter(mode='new'))
     dp.register_message_handler(date_handler, state=FSMMaintenance.new_maintenance_date)
     dp.register_message_handler(odo_handler, state=FSMMaintenance.new_maintenance_odo)
