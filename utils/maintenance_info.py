@@ -20,7 +20,7 @@ def make_maintenance_info(user_id: str, car: str) -> str:
         else:
             service_interval = until_next_maintenance = 'NOT FOUND'
         return f'Последнее ТО:\n\n' \
-               f'🚗  {car}\n\n' \
+               f'🚗  <b>{car}</b>\n\n' \
                f'📅  {datetime.fromisoformat(last_maintenance.date).strftime("%d.%m.%Y")}\n\n' \
                f'📟  {last_maintenance.odo} км\n\n' \
                f'{until_next_maintenance}\n\n' \

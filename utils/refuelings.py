@@ -4,8 +4,7 @@ from datetime import datetime
 
 from aiogram import types
 
-from . import db
-from . import exceptions
+from . import db, exceptions
 from .db import Refueling
 from .graphs_settings import make_graph_stat
 
@@ -47,7 +46,7 @@ def last_fuel_expense(user_id: str, car: str) -> str:
         distance = refs[0]['odo'] - refs[-1]['odo']  # Пройденная дистанция
         spent_fuel = sum(i['filing_volume'] for i in refs[:-1])
         expense = round(spent_fuel / distance * 100, 2)  # Расход
-        answer = f'🚗  {car}\n\n' \
+        answer = f'🚗  <b>{car}</b>\n\n' \
                  f'📅  {datetime.fromisoformat(refs[0]["date"]).strftime("%d.%m.%Y %H:%M")}\n\n' \
                  f'📊  <b>{expense}</b> л / 100 км'
         if until := get_distance_to_maintenance(user_id, car):
@@ -65,7 +64,7 @@ def volume_since_last_full_fill(user_id: str, car: str) -> str:
     """Возвращает количество литров, заправленные с последней полной заправки"""
     refs = db.get_last_partial_ref_on_car(user_id, car)
     volume = round(sum(ref['filing_volume'] for ref in refs))
-    return f'🚗  {car}\n\n' \
+    return f'🚗  <b>{car}</b>\n\n' \
            f'📅  {datetime.fromisoformat(refs[0]["date"]).strftime("%d.%m.%Y %H:%M")}\n\n' \
            f'⛽  Заправил уже <b>{volume}</b> л'
 
@@ -126,7 +125,7 @@ def get_month_analytic(user_id: str, car: str) -> str:
     if refuelings := db.get_refuelings_list_for_month(user_id, car):
         filing_volume_sum, odo_string = get_stat_for_period(refuelings)
         return f'📊  За последние 30 дней\n\n' \
-               f'🚗  {car}\n\n' \
+               f'🚗  <b>{car}</b>\n\n' \
                f'{odo_string}' \
                f'⛽  заправлено <b>{filing_volume_sum}</b> л'
     else:
@@ -138,7 +137,7 @@ def get_current_year_analytic(user_id: str, car: str) -> str:
     if refuelings := db.get_refuelings_list_for_current_year(user_id, car):
         filing_volume_sum, odo_string = get_stat_for_period(refuelings)
         return f'📊  С начала года\n\n' \
-               f'🚗  {car}\n\n' \
+               f'🚗  <b>{car}</b>\n\n' \
                f'{odo_string}' \
                f'⛽  заправлено <b>{filing_volume_sum}</b> л'
     else:

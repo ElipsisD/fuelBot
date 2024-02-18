@@ -28,7 +28,7 @@ async def new_cmd(call: types.CallbackQuery):
 
 async def choice_of_refueling_mode(call: types.CallbackQuery, callback_data: dict):
     car = callback_data.get('car')
-    await call.message.edit_text(f"Автомобиль: {car}\n\n"
+    await call.message.edit_text(f"Автомобиль: <b>{car}</b>\n\n"
                                  "Как заправляем?")
     await call.message.edit_reply_markup(reply_markup=refueling_mode(car))
 
