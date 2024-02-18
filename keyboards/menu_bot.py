@@ -27,6 +27,10 @@ menu = InlineKeyboardMarkup(inline_keyboard=[
         callback_data='maintenance'
     )],
     [InlineKeyboardButton(
+        text='🔩НАСТРОЙКИ🔩',
+        callback_data='settings'
+    )],
+    [InlineKeyboardButton(
         text='🚗ГАРАЖ🚗',
         callback_data='action menu cars'
     )],
