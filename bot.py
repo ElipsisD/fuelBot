@@ -12,6 +12,7 @@ from handlers.maintenance import register_user_maintenance
 from handlers.my_cars import register_user_my_cars
 from handlers.new_ref import register_user_new_ref
 from handlers.new_user import register_new_user
+from handlers.settings import register_user_settings
 from handlers.stat import register_user_stat
 from handlers.user import register_user
 from misc.logging import logger_config
@@ -35,6 +36,7 @@ def register_all_handlers(disp: Dispatcher):
     register_user_new_ref(disp)
     register_user_my_cars(disp)
     register_user_stat(disp)
+    register_user_settings(disp)
     register_logs(disp)
     register_user(disp)
 

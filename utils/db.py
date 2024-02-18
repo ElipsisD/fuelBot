@@ -90,6 +90,30 @@ def get_two_last_full_ref_on_car(user_id: str, car: str) -> list:
     return []
 
 
+def get_last_user_refueling(user_id: str) -> Refueling | None:
+    """Возвращает данные о последней заправке пользователя"""
+    ref = refuelings[-1] if (refuelings := get_data()[user_id]['refuelings']) else None
+    return (
+        Refueling(
+            date=ref['date'],
+            odo=ref['odo'],
+            filing_volume=ref['filing_volume'],
+            car=ref['car']
+        )
+        if ref
+        else None
+    )
+
+
+def change_last_refueling(user_id: str, odo: int, filing_volume: float) -> None:
+    """Изменяет данные о последней заправке пользователя"""
+    data = get_data()
+    last_refueling = data[user_id]["refuelings"][-1]
+    last_refueling["odo"] = odo
+    last_refueling["filing_volume"] = filing_volume
+    set_data(data)
+
+
 def get_last_partial_ref_on_car(user_id: str, car: str) -> list:
     """Возвращает массив с информацией о последних частичных заправках"""
     refuelings = [ref for ref in get_data()[user_id]['refuelings'] if ref['car'] == car]

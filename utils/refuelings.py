@@ -156,3 +156,37 @@ def get_stat_for_period(data: list[Refueling]) -> tuple[int, str]:
         odo_value = max(odo_values) - min(odo_values)
         odo_string = f'📟  пройдено {odo_value} км\n\n'
     return round(filing_volume_sum, 2), odo_string
+
+
+def last_refueling_data(user_id: str) -> tuple[str, bool]:
+    """Формирование ответа с информацией о последней заправке"""
+    if ref := db.get_last_user_refueling(user_id):
+        full_ref_mode = bool(ref.odo)
+        if full_ref_mode:
+            answer = f'📋  Последние данные о заправке\n\n' \
+                     f'🚗  <b>{ref.car}</b>\n\n' \
+                     f'📟  {ref.odo} км\n\n' \
+                     f'⛽  {ref.filing_volume} л\n\n' \
+                     f'Введите новые данные в формате:\n' \
+                     f'объем_заправки_в_литрах общий_пробег\nПример:\n48,21 125485'
+        else:
+            answer = f'📋  Последние данные о заправке\n\n' \
+                     f'🚗  <b>{ref.car}</b>\n\n' \
+                     f'⛽  {ref.filing_volume} л\n\n' \
+                     f'Введите новые данные в формате:\n' \
+                     f'объем_заправки_в_литрах\nПример:\n48,21'
+        return answer, full_ref_mode
+    else:
+        raise exceptions.NotEnoughRefuelings(
+            'Вы еще не разу не заправлялись 🗿'
+        )
+
+
+def change_last_refueling(user_id: str, message: str, full_ref_mode: bool) -> None:
+    """Изменить данные о последней заправке"""
+    if full_ref_mode:
+        # Нет проверки, на случай если новый пробег ниже предыдущего
+        odo, filing_volume = _parse_message(message)
+    else:
+        odo, filing_volume = 0, float(message.replace(',', '.').strip())
+    db.change_last_refueling(user_id, odo, filing_volume)
