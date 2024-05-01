@@ -46,7 +46,7 @@ async def schedule(bot: Bot, logs_chat):
 
 
 async def main():
-    config = load_config('.env')
+    config = load_config('data/.env')
 
     storage = MemoryStorage()  # RedisStorage2() is config.tg_bot.config.use_redis else MemoryStorage()
     bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
