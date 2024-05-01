@@ -7,10 +7,9 @@ TestFolder/
 /.idea/
 *.db
 *.json
-/.env
+/.env*
 users_graphs/*.png
 /for_tests.py
 logs/*.log
-fuelbot_venv
 fuelbot_venv
 /data/
