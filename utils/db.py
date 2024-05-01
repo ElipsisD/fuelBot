@@ -23,7 +23,7 @@ class Maintenance(NamedTuple):
     odo: int
 
 
-filename = 'db.json'
+filename = 'data/db.json'
 graph_path = 'fuelBot/users_graphs'
 
 
