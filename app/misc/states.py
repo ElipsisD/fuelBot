@@ -1,0 +1,21 @@
+from aiogram.fsm.state import State, StatesGroup
+
+
+class FSMNewRefueling(StatesGroup):
+    adding_car = State()
+    choice_of_car = State()
+    data = State()
+
+
+class FSMActions(StatesGroup):
+    new_car_name = State()
+
+
+class FSMMaintenance(StatesGroup):
+    new_maintenance_date = State()
+    new_maintenance_odo = State()
+
+
+class FSMSettings(StatesGroup):
+    new_service_interval = State()
+    change_last_refueling = State()

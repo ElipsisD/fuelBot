@@ -1,0 +1,10 @@
+services:
+  fuelbot:
+    build:
+      context: .
+    container_name: fuelbot
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - ".:/app"
