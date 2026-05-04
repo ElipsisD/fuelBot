@@ -1,5 +1,6 @@
 from typing import Any
 
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, Message
 
@@ -11,8 +12,17 @@ async def edit_message(
     text: str,
     reply_markup: InlineKeyboardMarkup | None = None,
 ) -> None:
-    await message.edit_text(text)
-    await message.edit_reply_markup(reply_markup=reply_markup)
+    try:
+        await message.edit_text(text)
+    except TelegramBadRequest as e:
+        if not _is_not_modified_error(e):
+            raise
+
+    try:
+        await message.edit_reply_markup(reply_markup=reply_markup)
+    except TelegramBadRequest as e:
+        if not _is_not_modified_error(e):
+            raise
 
 
 async def edit_callback_message(
@@ -47,3 +57,7 @@ async def delete_message(message: Message) -> None:
 
 async def answer_with_main_menu(message: Message, first_name: str) -> None:
     await message.answer(f"⬇<b>{first_name}</b>, выбирай⬇", reply_markup=menu)
+
+
+def _is_not_modified_error(error: TelegramBadRequest) -> bool:
+    return "message is not modified" in str(error).lower()

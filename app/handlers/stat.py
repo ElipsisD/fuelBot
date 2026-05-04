@@ -41,6 +41,8 @@ async def get_last_car_stat(call: CallbackQuery, callback_data: StatCallback):
         await edit_callback_message(call, answer, menu)
     except exceptions.NotEnoughRefuelings as e:
         await edit_callback_message(call, str(e), menu)
+    except ZeroDivisionError as e:
+        await edit_callback_message(call, str(e), menu)
 
 
 @router.callback_query(StatCallback.filter(F.mode == 'graph'))

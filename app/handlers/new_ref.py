@@ -80,3 +80,6 @@ async def data_handler(m: Message, state: FSMContext):
     except (exceptions.NotCorrectRefueling, exceptions.NotEnoughRefuelings) as e:
         await m.delete()
         await edit_message(prev_m, str(e), back_key)
+    except ZeroDivisionError as e:
+        await m.delete()
+        await edit_message(prev_m, str(e), back_key)
