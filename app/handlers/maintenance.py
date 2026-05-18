@@ -36,7 +36,7 @@ async def mode_choice(call: CallbackQuery, callback_data: MaintenanceCallback):
 
 
 @router.callback_query(MaintenanceCallback.filter(F.mode == 'new'))
-async def new_maintenance(call: CallbackQuery, state: FSMContext, callback_data: MaintenanceCallback):
+async def new_maintenance_handler(call: CallbackQuery, state: FSMContext, callback_data: MaintenanceCallback):
     """Реакция на кнопку НОВОЕ ТО"""
     await prompt_for_state(
         call,
